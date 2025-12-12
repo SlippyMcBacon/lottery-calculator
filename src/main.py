@@ -116,4 +116,4 @@ if __name__ == '__main__':
                     best = check
     print("")
     print(best)
-    # atomic cash, boulder blast, clue, cow abduction, miner jack's combo caverns,
+    # atomic cash, boulder blast, clue, cow abduction, miner jack's combo caverns, pinata blast, prospectors gold rush, The mystery of jekyll and hyde, treasure tomb, wobblyblobs, zombie jive

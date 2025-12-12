@@ -3,7 +3,10 @@ import os
 def numberize(str):
     if "$" in str:
         elements = str.split("$")
-        return float(elements[1].replace(",", ""))
+        num = float(elements[1].replace(",", ""))
+        if elements[0] == "-":
+            num *= -1
+        return num
     elif str == '':
         return str
     else:
@@ -79,20 +82,21 @@ def get_stats(filename):
     # print("")
     pertable = get_per(ftable, .1)
     ev = get_rtp(pertable)[0]
-    perrtp = get_rtp(pertable)[1]
+    prtp = get_rtp(pertable)[1]
     var = get_var(pertable, ev)
     sd = pow(var, .5)
     persum = 0
     for i in range(1, len(pertable[-1])):
         persum += pertable[-1][i]
     # print("hit freq", round(persum * 100, 2), "%")
-    return [round(rtp, 2), round(abs(sum - persum) * 100, 2), round(perrtp, 2)]
+    return [round(rtp, 2), round(abs(sum - persum) * 100, 2), round(prtp, 2), round(rtp - (100 - prtp), 2)]
 
 
 if __name__ == '__main__':
-    long = False
+    long = True
     directory_path = "../lotteries"
-    best = [0, 100, 0, "name"]
+    # rtp, hit freq - per hit freq, prtp, rtp - (100 - prtp)
+    best = [0, 100, 0, -100, "name"]
     for root, _, files in os.walk(directory_path):
         for file_name in files:
             file_path = os.path.join(root, file_name)
@@ -100,14 +104,16 @@ if __name__ == '__main__':
             check.append(file_name)
             print(check)
             if long:
-                if check[0] == best[0]:
-                    if check[1] < best[1]:
-                        best = check
-                elif check[0] > best[0]:
+                #if check[0] == best[0]:
+                #    if check[1] < best[1]:
+                #    best = check
+                #elif check[0] > best[0]:
+                #    best = check
+                if(check[3] > best[3]):
                     best = check
             else:
                 if check[2] > best[2]:
                     best = check
     print("")
     print(best)
-    # atomic cash, boulder blast, clue, cow abduction,
+    # atomic cash, boulder blast, clue, cow abduction, miner jack's combo caverns,

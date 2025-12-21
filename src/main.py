@@ -1,4 +1,5 @@
 import os
+import copy
 
 def numberize(str):
     if "$" in str:
@@ -27,23 +28,38 @@ def get_var(ftable,ev):
         sum += ((ftable[0][i] - ev) ** 2) * ftable[-1][i]
     return sum
 
-def get_per(ftable, percent):
+def get_perlim(table, percent):
     # print(percent * 100, "Percent Table")
-    mtable = ftable
-    pertable = [[ftable[0][0]], [ftable[-1][0]]]
+    mtable = table
+    pertable = [[table[0][0]], [table[-1][0]]]
     # print("most likely", round(len(ftable[-1]) * percent), "outcomes")
-    for i in range(1, round(len(ftable[-1]) * percent)):
+    check = True
+    while check:
         biggest = [mtable[0][1], mtable[-1][1], 1]
         for j in range(1, len(mtable[-1])):
             if mtable[-1][j] > biggest[1]:
                 biggest = [mtable[0][j], mtable[-1][j], j]
-        pertable[0].append(biggest[0])
-        pertable[1].append(biggest[1])
-        # print("X", round(biggest[0]/ftable[0][0], 2), round(biggest[1] * 100, 2), "%")
-        index = biggest[2]
-        mtable[0].pop(index)
-        mtable[-1].pop(index)
+        if biggest[1] < percent:
+            check = False
+        else:
+            pertable[0].append(biggest[0])
+            pertable[1].append(biggest[1])
+            # print("X", round(biggest[0]/ftable[0][0], 2), round(biggest[1] * 100, 2), "%")
+            index = biggest[2]
+            mtable[0].pop(index)
+            mtable[-1].pop(index)
     return pertable
+
+def get_mlr(ftable):
+    ret = [-1, 0]
+    for i in range(1, len(ftable[0])):
+        look = [ftable[-1][i], ftable[0][i]/ftable[0][0]]
+        if look[0] == ret[0]:
+            if look[1] > ret[1]:
+                ret = look
+        elif look[0] > ret[0]:
+            ret = look
+    return ret[0] * ret[1]
 
 def get_stats(filename):
     name = filename.split("../lotteries")
@@ -80,40 +96,50 @@ def get_stats(filename):
     # print("hit freq", round(sum * 100, 2), "%")
 
     # print("")
-    pertable = get_per(ftable, .1)
-    ev = get_rtp(pertable)[0]
-    prtp = get_rtp(pertable)[1]
-    var = get_var(pertable, ev)
-    sd = pow(var, .5)
-    persum = 0
-    for i in range(1, len(pertable[-1])):
-        persum += pertable[-1][i]
     # print("hit freq", round(persum * 100, 2), "%")
-    return [round(rtp, 2), round(abs(sum - persum) * 100, 2), round(prtp, 2), round(rtp - (100 - prtp), 2)]
+
+    perlimtable = ftable
+    perlimtable = get_perlim(copy.deepcopy(perlimtable), .01)
+    ev = get_rtp(perlimtable)[0]
+    plrtp = get_rtp(perlimtable)[1]
+    var = get_var(perlimtable, ev)
+    sd = pow(var, .5)
+    perlimsum = 0
+    for i in range(1, len(perlimtable[-1])):
+        perlimsum += perlimtable[-1][i]
+    # print("hit freq", round(persum * 100, 2), "%")
+
+    return [round(rtp, 2), round(sum * 100, 2), round(plrtp, 2), round((get_mlr(copy.deepcopy(ftable)) * 100), 2), ((ftable[0][-1]/ftable[0][0]) * ftable[-1][-1]) * 100, ftable[0][0]]
 
 
 if __name__ == '__main__':
-    long = True
+    weighted = False
     directory_path = "../lotteries"
-    # rtp, hit freq - per hit freq, prtp, rtp - (100 - prtp)
-    best = [0, 100, 0, -100, "name"]
+    # rtp//hit freq//percent limit rtp//most likely return//jackpot rtp//min bet
+    best = [0, 0, 0, 0, 0, 100, "name"]
     for root, _, files in os.walk(directory_path):
         for file_name in files:
             file_path = os.path.join(root, file_name)
             check = get_stats(file_path)
-            check.append(file_name)
-            print(check)
-            if long:
-                #if check[0] == best[0]:
-                #    if check[1] < best[1]:
-                #    best = check
-                #elif check[0] > best[0]:
-                #    best = check
-                if(check[3] > best[3]):
+            check.append(file_name.split(".tsv")[0])
+            if weighted:
+                rtpW = 1 #.3
+                oowW = 1 #.1
+                plrtpW = 1 #.5
+                mlrW = 1 #.7
+                checkW = (check[0] * rtpW) + (check[1] * oowW) + (check[2] * plrtpW) + (check[3] * mlrW)
+                bestW = (best[0] * rtpW) + (best[1] * oowW) + (best[2] * plrtpW) + (best[3] * mlrW)
+                if checkW > bestW:
                     best = check
+                if check[4] <= 50 and checkW > 180:
+                    print(check, checkW)
             else:
-                if check[2] > best[2]:
+                if check[4] > 1.8:
+                    print(check)
+                if check[4] > best[4]:
                     best = check
     print("")
+    print(" RTP%  Win%  LimRTP% MLR%")
     print(best)
     # atomic cash, boulder blast, clue, cow abduction, miner jack's combo caverns, pinata blast, prospectors gold rush, The mystery of jekyll and hyde, treasure tomb, wobblyblobs, zombie jive
+    # what game has best odds of getting money back

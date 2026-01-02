@@ -109,11 +109,11 @@ def get_stats(filename):
         perlimsum += perlimtable[-1][i]
     # print("hit freq", round(persum * 100, 2), "%")
 
-    return [round(rtp, 2), round(sum * 100, 2), round(plrtp, 2), round((get_mlr(copy.deepcopy(ftable)) * 100), 2), ((ftable[0][-1]/ftable[0][0]) * ftable[-1][-1]) * 100, ftable[0][0]]
+    return [round(rtp, 2), round(sum * 100, 2), round(plrtp, 2), round((get_mlr(copy.deepcopy(ftable)) * 100), 2), round(((ftable[0][-1]/ftable[0][0]) * ftable[-1][-1]) * 100, 2), ftable[0][0]]
 
 
 if __name__ == '__main__':
-    weighted = False
+    weighted = True
     directory_path = "../lotteries"
     # rtp//hit freq//percent limit rtp//most likely return//jackpot rtp//min bet
     best = [0, 0, 0, 0, 0, 100, "name"]
@@ -123,15 +123,15 @@ if __name__ == '__main__':
             check = get_stats(file_path)
             check.append(file_name.split(".tsv")[0])
             if weighted:
-                rtpW = 1 #.3
-                oowW = 1 #.1
-                plrtpW = 1 #.5
-                mlrW = 1 #.7
+                rtpW = .3 #.3
+                oowW = .1 #.1
+                plrtpW = .5 #.5
+                mlrW = .7 #.7
                 checkW = (check[0] * rtpW) + (check[1] * oowW) + (check[2] * plrtpW) + (check[3] * mlrW)
                 bestW = (best[0] * rtpW) + (best[1] * oowW) + (best[2] * plrtpW) + (best[3] * mlrW)
                 if checkW > bestW:
                     best = check
-                if check[4] <= 50 and checkW > 180:
+                if check[5] <= 50 and checkW > 70:
                     print(check, checkW)
             else:
                 if check[4] > 1.8:

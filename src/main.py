@@ -131,7 +131,7 @@ if __name__ == '__main__':
                 bestW = (best[0] * rtpW) + (best[1] * oowW) + (best[2] * plrtpW) + (best[3] * mlrW)
                 if checkW > bestW:
                     best = check
-                if check[5] <= 50 and checkW > 70:
+                if check[5] <= 50 and checkW > 50:
                     print(check, checkW)
             else:
                 if check[4] > 1.8:

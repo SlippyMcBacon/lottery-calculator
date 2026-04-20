@@ -141,5 +141,5 @@ if __name__ == '__main__':
     print("")
     print(" RTP%  Win%  LimRTP% MLR%")
     print(best)
-    # atomic cash, boulder blast, clue, cow abduction, miner jack's combo caverns, pinata blast, prospectors gold rush, The mystery of jekyll and hyde, treasure tomb, wobblyblobs, zombie jive
+    # atomic cash, boulder blast, clue, cow abduction, miner jack's combo caverns, pinata blast, prospectors gold rush, The mystery of jekyll and hyde, treasure tomb, wobblyblobs, zombie jive, Sword in the stone, daily pot of gold
     # what game has best odds of getting money back
